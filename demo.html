@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Demo Page</title>
+    <style>
+        #myCanvas{
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+        #myIframe{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height:100%;
+            z-index: 99;
+        }
+        #result{
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 101;
+        }
+    </style>
+</head>
+
+<body>
+    <p id="result"></p>
+    <canvas id="myCanvas" width="360" height="360"></canvas>
+    <iframe id="myIframe" src="http://www.w3schools.com"></iframe>
+    <script type="text/javascript">
+        var canvas = document.getElementById('myCanvas');
+        var ctx = canvas.getContext('2d');
+        var myIframe = document.getElementById('myIframe');
+        ctx.strokeStyle = '#000';
+
+        var ws;
+        var ip = "localhost";
+        ws = new WebSocket("ws://" + ip + ":8080");
+        ws.onopen = function() {
+            // Web Socket is connected, send data using send()
+        };
+        ws.onmessage = function(evt) {
+            var received_msg = evt.data;
+            console.log(received_msg);
+            var received_msg_obj = JSON.parse(received_msg);
+            switch (received_msg_obj.action) {
+                case "result":
+                    ctx.clearRect(0, 0, 360, 360);
+                    var pointsSize = received_msg_obj.points.length;
+                    var resultName = received_msg_obj.result.Name;
+                    ctx.beginPath();
+                    ctx.moveTo(received_msg_obj.points[0].X, received_msg_obj.points[0].Y);
+                    for (var i = 1; i < pointsSize; i++) {
+                        ctx.lineTo(received_msg_obj.points[i].X, received_msg_obj.points[i].Y);
+                    }
+//                    ctx.closePath();
+                    ctx.stroke();
+                    document.getElementById('result').innerHTML = resultName;
+                    if(resultName == 'heart'){
+//                        window.location.replace("http://stackoverflow.com");
+                    myIframe.setAttribute("src","https://www.spotify.com/tw/"); 
+                    }else if(resultName == 'circle'){
+                        myIframe.setAttribute("src","http://www.dcview.com/"); 
+                    }
+                    
+                    break;
+                default:
+            }
+        };
+
+        ws.onclose = function() {
+            // websocket is closed.
+        };
+    </script>
+</body>
+
+</html>
