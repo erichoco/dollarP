@@ -9,7 +9,6 @@ var WebSocketServer = require('ws').Server,
     });
 
 var myRecog = new PDollarRecognizer();
-//addExistedGestures();
 
 wss.on('connection', function (ws) {
     ws.on('message', function (message) {
@@ -28,35 +27,18 @@ wss.on('connection', function (ws) {
                 }
 
                 if (existedGestures.length != 0) {
-                    //                        console.log(existedGestures);
-                    //                        custGestureArray.push(existedGestures);
                     for (var i = 0; i < existedGestures.length; i++) {
                         custGestureArray.push(existedGestures[i]);
                     }
-                    //                        console.log("exist");
                 }
                 if (message_obj.points.length > 10) {
                     custGestureArray.push(message_obj);
                     writeToFile(JSON.stringify(custGestureArray), filepath + "custGesture");
                 }
-
-                //                    var recognizer = new DollarRecognizer();
-                //                recognizer.AddGesture(message_obj.name, message_obj.points);
-                //                    console.log(JSON.stringify(custGestureArray));
-
-                //                appendToFile(message, filepath + "custGesture");
                 break;
             case "gesture":
-                //                    var custGestureObj = new Object();
-                //                    try {
-                //                    custGestureObj = JSON.parse(fs.readFileSync(filepath + "custGesture").toString());
-                //                } catch (e) {
-                //                    console.log(e);
-                //                }
                 myRecog = new PDollarRecognizer();
-                //                    recognizer.AddGesture
                 addExistedGestures();
-                //                    console.log(recognizer);
                 if (message_obj.points.length > 10) {
                     console.log(myRecog.Recognize(message_obj.points, false));
                     var resultObj = new Object();
@@ -65,8 +47,6 @@ wss.on('connection', function (ws) {
                     resultObj.points = message_obj.points;
                     wss.broadcast(JSON.stringify(resultObj));
                 }
-
-                //                    console.log(custGestureObj);
                 break;
             default:
             }
@@ -88,7 +68,6 @@ function addExistedGestures() {
             myRecog.AddGesture(existedGestures[i].name, existedGestures[i].points);
         }
     }
-    //    console.log(myRecog);
 }
 
 wss.broadcast = function (data) {
